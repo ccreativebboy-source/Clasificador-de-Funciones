@@ -1,0 +1,83 @@
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f7fa;
+    color: #334155;
+    padding: 10px;
+}
+
+.contenedor {
+    max-width: 650px;
+    margin: auto;
+    border: 1px solid #64748b;
+    padding: 18px;
+}
+
+h2 {
+    text-align: center;
+    font-size: 16px;
+    color: #475569;
+    margin-top: 0;
+}
+
+.coeficiente {
+    background-color: white;
+    border: 1px solid #b8c7d9;
+    padding: 10px;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.coeficiente b {
+    margin-right: 10px;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    margin: 2px 0 10px;
+    background-color: #e2e8f0;
+    border: 1px solid #334155;
+    color: #334155;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.caja {
+    background-color: white;
+    border: 2px dotted #70b9d0;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.caja h3 {
+    font-size: 14px;
+    margin: 0 0 8px;
+}
+
+.caja div {
+    font-size: 13px;
+    color: #64748b;
+    line-height: 1.5;
+}
+
+.enlaces {
+    border-top: 1px solid #cbd5e1;
+    margin-top: 10px;
+    padding-top: 5px;
+    font-size: 13px;
+}
+
+.enlaces a {
+    color: #2563eb;
+}
+
+@media (max-width: 500px) {
+    .contenedor {
+        padding: 12px;
+    }
+
+    .coeficiente {
+        padding: 12px 5px;
+    }
+}
