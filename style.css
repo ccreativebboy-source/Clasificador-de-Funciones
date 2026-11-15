@@ -1,16 +1,29 @@
-
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f7fa;
-    color: #334155;
+    background-color: #ffffff;
+    color: #000000;
     padding: 10px;
+    cursor: default;
+    background-image: url("img/background.png");
+    background-size:auto;
 }
 
 .contenedor {
+    background-color: white;
     max-width: 650px;
     margin: auto;
-    border: 1px solid #64748b;
+    border-radius: 5px;
+    border: 2px solid #7486a0;
     padding: 18px;
+    box-shadow: 0px 5px 5px 5px #60648a4b;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.contenedor h1 {
+    text-align: center;
+    color: #8c939b;
+    text-shadow: 0px 3px 0px #2c2d50;
 }
 
 h2 {
@@ -41,12 +54,25 @@ button {
     color: #334155;
     font-weight: bold;
     cursor: pointer;
+    border-radius: 5px 5px 20px 30px;
+}
+
+button:hover {
+    background-color: #dadfe6;
+    box-shadow: inset 0px 5px 10px #ffffff;
+}
+
+button:active {
+    box-shadow: inset 0px 5px 10px #565c7748;
+    background-color: #b9c2ce;
+    color: #ffffff;
 }
 
 .caja {
     background-color: white;
-    border: 2px dotted #70b9d0;
+    border: 2px dotted #1d314b;
     padding: 10px;
+    box-shadow: inset 0px 5px 10px #00125f2a;
     margin-bottom: 10px;
 }
 
@@ -70,14 +96,4 @@ button {
 
 .enlaces a {
     color: #2563eb;
-}
-
-@media (max-width: 500px) {
-    .contenedor {
-        padding: 12px;
-    }
-
-    .coeficiente {
-        padding: 12px 5px;
-    }
 }
