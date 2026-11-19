@@ -1,14 +1,33 @@
 let bActual = null;
 let cActual = null;
+let ggbApplet = null;
+
+// Inicializar el visor visual de GeoGebra Clásico al cargar la página
+window.addEventListener("load", function () {
+    const params = {
+        appName: "classic",
+        width: 600,
+        height: 380,
+        showToolBar: true,
+        showAlgebraInput: true,
+        showMenuBar: false,
+        language: "es",
+        appletOnLoad: function (api) {
+            ggbApplet = api;
+        }
+    };
+    const applet = new GGBApplet(params, true);
+    applet.inject("ggb-element");
+});
 
 function generar() {
-    let b = Math.floor(Math.random() * 21) - 10;
+    let b = Math.floor(Math.random() * 21) - 3;
     let esLineal = Math.random() < 0.5;
     let c = 0;
 
     if (!esLineal) {
         do {
-            c = Math.floor(Math.random() * 21) - 10;
+            c = Math.floor(Math.random() * 21) - 3;
         } while (c === 0);
     }
 
@@ -17,9 +36,16 @@ function generar() {
 
     actualizarInterfaz(b, c);
     document.getElementById("btnDescargar").disabled = false;
+
+    // Graficar la función en el visor visual de GeoGebra
+    if (ggbApplet) {
+        ggbApplet.reset();
+        const expresion = c === 0 ? `f(x) = ${b}*x` : `f(x) = ${b}*x + (${c})`;
+        ggbApplet.evalCommand(expresion);
+    }
 }
 
-// Pinta los resultados directamente en los coeficientes y en las cajas de esquema
+// Actualiza coeficientes, resultado y cajas LINEAL / AFÍN
 function actualizarInterfaz(b, c) {
     document.getElementById("valorB").innerText = b;
     document.getElementById("valorC").innerText = c;
@@ -53,34 +79,21 @@ function actualizarInterfaz(b, c) {
     }
 }
 
-// Genera y descarga un archivo .ggb válido para abrir en GeoGebra Clásico
+// Descargar la construcción actual del visor como archivo .ggb
 async function descargarGGB() {
     if (bActual === null || cActual === null) return;
 
-    const zip = new JSZip();
-    const xmlContent = `<?xml version="1.0" encoding="utf-8"?>
-<geogebra format="5.0" version="5.0.0.0" app="classic" platform="w">
-<construction title="Funcion" author="" date="">
-<expression label="f" exp="f(x) = ${bActual} * x + ${cActual}" type="function"/>
-<element type="function" label="f">
-    <show object="true" label="true"/>
-    <objColor r="0" g="0" b="255" alpha="0"/>
-    <layer val="0"/>
-    <lineStyle thickness="5" type="0"/>
-</element>
-</construction>
-</geogebra>`;
-
-    zip.file("geogebra.xml", xmlContent);
-    const blob = await zip.generateAsync({ type: "blob" });
-
-    const enlace = document.createElement("a");
-    enlace.href = URL.createObjectURL(blob);
-    enlace.download = `funcion_b${bActual}_c${cActual}.ggb`;
-    enlace.click();
+    if (ggbApplet && typeof ggbApplet.getBase64 === "function") {
+        ggbApplet.getBase64(function (base64) {
+            const enlace = document.createElement("a");
+            enlace.href = "data:application/vnd.geogebra.file;base64," + base64;
+            enlace.download = `funcion_b${bActual}_c${cActual}.ggb`;
+            enlace.click();
+        });
+    }
 }
 
-// Lee un archivo .ggb subido y actualiza automáticamente los resultados en pantalla
+// Subir archivo .ggb externo, cargarlo en el visor y actualizar las cajas de esquema
 document.getElementById("archivo").addEventListener("change", function () {
     let archivo = this.files[0];
 
@@ -93,14 +106,27 @@ document.getElementById("archivo").addEventListener("change", function () {
         reader.onload = async function (e) {
             const arrayBuffer = e.target.result;
 
+            // 1. Cargar el archivo en el visor visual de GeoGebra
+            const bytes = new Uint8Array(arrayBuffer);
+            let binary = "";
+            for (let i = 0; i < bytes.byteLength; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            const base64 = btoa(binary);
+
+            if (ggbApplet) {
+                ggbApplet.setBase64(base64, function () {
+                    analizarDesdeApplet();
+                });
+            }
+
+            // 2. Leer el XML interno del .ggb para clasificar en las cajas
             try {
                 const zip = await JSZip.loadAsync(arrayBuffer);
                 const xmlFile = zip.file("geogebra.xml");
                 if (xmlFile) {
                     const xmlText = await xmlFile.async("string");
                     analizarFuncionDesdeXML(xmlText);
-                } else {
-                    alert("El archivo .ggb seleccionado no contiene un formato válido.");
                 }
             } catch (err) {
                 console.error("Error al leer el .ggb:", err);
@@ -115,7 +141,7 @@ document.getElementById("archivo").addEventListener("change", function () {
     }
 });
 
-// Interpreta expresiones algebraicas para extraer 'b' y 'c'
+// Extrae los coeficientes b y c desde una expresión algebraica
 function parsearExpresionLineal(texto) {
     if (!texto) return null;
 
@@ -156,7 +182,6 @@ function analizarFuncionDesdeXML(xmlText) {
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(xmlText, "text/xml");
 
-    // Buscar en expresiones
     const expresiones = xmlDoc.getElementsByTagName("expression");
     for (let i = 0; i < expresiones.length; i++) {
         const exp = expresiones[i].getAttribute("exp");
@@ -167,7 +192,6 @@ function analizarFuncionDesdeXML(xmlText) {
         }
     }
 
-    // Buscar en comandos
     const comandos = xmlDoc.getElementsByTagName("command");
     for (let i = 0; i < comandos.length; i++) {
         const input = comandos[i].getElementsByTagName("input")[0];
@@ -181,8 +205,27 @@ function analizarFuncionDesdeXML(xmlText) {
         }
     }
 
-    alert("No se encontró una función lineal o afín identificable en el archivo.");
     return false;
+}
+
+// Consulta los objetos cargados en el visor como respaldo
+function analizarDesdeApplet() {
+    if (!ggbApplet) return;
+    const total = ggbApplet.getObjectNumber();
+
+    for (let i = 0; i < total; i++) {
+        const nombre = ggbApplet.getObjectName(i);
+        const tipo = ggbApplet.getObjectType(nombre);
+
+        if (tipo === "function" || tipo === "line") {
+            const definicion = ggbApplet.getDefinitionString(nombre) || ggbApplet.getValueString(nombre);
+            const resultado = parsearExpresionLineal(definicion);
+            if (resultado) {
+                aplicarResultadoDetectado(resultado.b, resultado.c);
+                return;
+            }
+        }
+    }
 }
 
 function aplicarResultadoDetectado(b, c) {

@@ -70,7 +70,7 @@ button:active {
 
 .caja {
     background-color: white;
-    border: 2px dotted #1d314b;
+    border: 2px solid #1d314b;
     padding: 10px;
     box-shadow: inset 0px 5px 10px #00125f2a;
     margin-bottom: 10px;

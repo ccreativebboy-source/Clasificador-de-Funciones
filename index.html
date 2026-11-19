@@ -5,83 +5,101 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clasificador de Funciones</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Librería JSZip para leer y empaquetar archivos .ggb -->
+    <!-- Librerías oficiales para visor y manipulación de archivos .ggb -->
+    <script src="https://www.geogebra.org/apps/deployggb.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="script.js" defer></script>
-    <link rel="icon" href="img/icon.png">
 </head>
 <body>
 
     <div class="contenedor">
 
-        <h1>CLASIFICADOR DE FUNCIONES</h1>
+        <header>
+            <h1>CLASIFICADOR DE FUNCIONES</h1>
+            <h2>ESQUEMA VERTICAL DE LA INTERFAZ</h2>
+        </header>
 
-        <h2>ESQUEMA VERTICAL DE LA INTERFAZ</h2>
+        <main>
 
-        <!-- Coeficientes -->
-        <div class="coeficiente">
-            <b>b =</b>
-            <span id="valorB">Random (-10 a 10)</span>
-        </div>
+            <!-- Generador y coeficientes -->
+            <section aria-label="Coeficientes y generador de función">
+                <div class="coeficiente">
+                    <b>b =</b>
+                    <span id="valorB">Random (-10 a 10)</span>
+                </div>
 
-        <div class="coeficiente">
-            <b>c =</b>
-            <span id="valorC">Random (-10 a 10)</span>
-        </div>
+                <div class="coeficiente">
+                    <b>c =</b>
+                    <span id="valorC">Random (-10 a 10)</span>
+                </div>
 
-        <!-- Botón generador -->
-        <button onclick="generar()">
-            Generar / Cambiar
-        </button>
+                <button type="button" onclick="generar()">
+                    Generar / Cambiar
+                </button>
 
-        <h3 id="resultado">Esperando resultados...</h3>
+                <h3 id="resultado">Esperando resultados...</h3>
+            </section>
 
-        <!-- Clasificación lineal -->
-        <div class="caja">
-            <h3>LINEAL</h3>
+            <!-- Clasificación lineal y afín -->
+            <section aria-label="Clasificación de la función">
+                <article class="caja">
+                    <h3>LINEAL</h3>
 
-            <div id="lineal">
-                Muestra las propiedades de la Función Lineal
-                si cumple la condición (c = 0).
-            </div>
-        </div>
+                    <div id="lineal">
+                        Muestra las propiedades de la Función Lineal
+                        si cumple la condición (c = 0).
+                    </div>
+                </article>
 
-        <!-- Clasificación afín -->
-        <div class="caja">
-            <h3>AFÍN</h3>
+                <article class="caja">
+                    <h3>AFÍN</h3>
 
-            <div id="afin">
-                Muestra las propiedades de la Función Afín
-                si cumple la condición (c ≠ 0).
-            </div>
-        </div>
+                    <div id="afin">
+                        Muestra las propiedades de la Función Afín
+                        si cumple la condición (c ≠ 0).
+                    </div>
+                </article>
+            </section>
 
-        <!-- GeoGebra Enlaces / Archivos -->
-        <div class="geogebra">
-            <p><strong>ENLACE:</strong>
-                <a href="https://www.geogebra.org/classic" target="_blank">
-                    GeoGebra Clásico
+            <!-- Visor visual de GeoGebra -->
+            <section aria-label="Visualización en GeoGebra">
+                <article class="caja">
+                    <h3>GRÁFICO GEOGEBRA</h3>
+                    <div id="ggb-element"></div>
+                </article>
+            </section>
+
+            <!-- Gestión de archivos .ggb -->
+            <aside class="archivos" aria-label="Archivos de GeoGebra">
+                <button type="button" id="btnDescargar" onclick="descargarGGB()" disabled>
+                    Descargar función actual (.ggb)
+                </button>
+
+                <p>
+                    <b>SUBIR ARCHIVO .GGB:</b>
+                </p>
+
+                <input type="file" id="archivo" accept=".ggb">
+
+                <p id="nombreArchivo">
+                    Ningún archivo seleccionado.
+                </p>
+            </aside>
+
+        </main>
+
+        <footer class="geogebra">
+            <p>
+                <b>ENLACE:</b>
+                GeoGebra Clásico
+                <a href="https://www.geogebra.org/classic" target="_blank" rel="noopener noreferrer">
+                    (geogebra.org/classic)
                 </a>
             </p>
             <p>
-                Descarga la función actual para GeoGebra o sube un archivo .ggb para clasificarlo aquí:
+                Descarga la función actual para abrirla en GeoGebra o sube un archivo .ggb para verlo y clasificarlo aquí.
             </p>
-        </div>
-
-        <!-- Acciones de archivo -->
-        <div class="archivos">
-            <button type="button" id="btnDescargar" onclick="descargarGGB()" disabled>
-                Descargar función actual (.ggb)
-            </button>
-
-            <p><strong>SUBIR ARCHIVO .GGB:</strong></p>
-
-            <input type="file" id="archivo" accept=".ggb">
-
-            <p id="nombreArchivo">
-                Ningún archivo seleccionado.
-            </p>
-        </div>
+        </footer>
 
     </div>
 
