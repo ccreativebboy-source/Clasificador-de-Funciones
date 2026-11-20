@@ -25,12 +25,12 @@
             <section aria-label="Coeficientes y generador de función">
                 <div class="coeficiente">
                     <b>b =</b>
-                    <span id="valorB">Random (-10 a 10)</span>
+                    <span id="valorB">Random (-3 a 3)</span>
                 </div>
 
                 <div class="coeficiente">
                     <b>c =</b>
-                    <span id="valorC">Random (-10 a 10)</span>
+                    <span id="valorC">Random (-3 a 3)</span>
                 </div>
 
                 <button type="button" onclick="generar()">
@@ -40,23 +40,33 @@
                 <h3 id="resultado">Esperando resultados...</h3>
             </section>
 
-            <!-- Clasificación lineal y afín -->
+            <!-- Clasificación: Lineal, Afín, Constante y Sin Función -->
             <section aria-label="Clasificación de la función">
                 <article class="caja">
                     <h3>LINEAL</h3>
-
                     <div id="lineal">
-                        Muestra las propiedades de la Función Lineal
-                        si cumple la condición (c = 0).
+                        Muestra las propiedades de la Función Lineal si b ≠ 0 y c = 0.
                     </div>
                 </article>
 
                 <article class="caja">
                     <h3>AFÍN</h3>
-
                     <div id="afin">
-                        Muestra las propiedades de la Función Afín
-                        si cumple la condición (c ≠ 0).
+                        Muestra las propiedades de la Función Afín si b ≠ 0 y c ≠ 0.
+                    </div>
+                </article>
+
+                <article class="caja">
+                    <h3>CONSTANTE</h3>
+                    <div id="constante">
+                        Muestra las propiedades de la Función Constante si b = 0 y c ≠ 0.
+                    </div>
+                </article>
+
+                <article class="caja">
+                    <h3>SIN FUNCIÓN</h3>
+                    <div id="sinFuncion">
+                        Indica cuando no hay función si b = 0 y c = 0.
                     </div>
                 </article>
             </section>
@@ -97,7 +107,8 @@
                 </a>
             </p>
             <p>
-                Descarga la función actual para abrirla en GeoGebra o sube un archivo .ggb para verlo y clasificarlo aquí.
+                Descarga la función actual para abrirla en <a href="https://www.geogebra.org/classic" target="_blank" rel="noopener noreferrer">GeoGebra</a>
+                 o sube un archivo .ggb para verlo y clasificarlo aquí.
             </p>
         </footer>
 
