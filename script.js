@@ -1,10 +1,10 @@
 let bActual = null;
 let cActual = null;
-let ggbApplet = null;
+let ggb = null;
 
-// Inicia GeoGebra Clásico cuando carga la página
+// Carga el visor de GeoGebra Clásico
 window.addEventListener("load", function () {
-    const config = {
+    new GGBApplet({
         appName: "classic",
         width: 600,
         height: 380,
@@ -12,31 +12,20 @@ window.addEventListener("load", function () {
         showAlgebraInput: true,
         showMenuBar: false,
         language: "es",
-        appletOnLoad: function (api) {
-            ggbApplet = api;
-        }
-    };
-
-    const applet = new GGBApplet(config, true);
-    applet.inject("ggb-element");
+        appletOnLoad: function (api) { ggb = api; }
+    }, true).inject("ggb-element");
 });
 
-// Genera un número entero aleatorio entre min y max (ambos incluidos)
-function numeroAleatorio(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-// Genera b y c entre -3 y 3, actualiza todo y grafica en GeoGebra
+// Genera b y c aleatorios entre -3 y 3
 function generar() {
-    const b = numeroAleatorio(-3, 3);
-    const c = numeroAleatorio(-3, 3);
-
-    aplicarValores(b, c);
-    graficarEnGeoGebra(b, c);
+    const b = Math.floor(Math.random() * 7) - 3;
+    const c = Math.floor(Math.random() * 7) - 3;
+    mostrar(b, c);
+    graficar(b, c);
 }
 
-// Guarda valores, habilita descarga y actualiza pantalla
-function aplicarValores(b, c) {
+// Muestra coeficientes y clasifica en las 4 cajas
+function mostrar(b, c) {
     bActual = b;
     cActual = c;
 
@@ -44,177 +33,102 @@ function aplicarValores(b, c) {
     document.getElementById("valorC").innerText = c;
     document.getElementById("btnDescargar").disabled = false;
 
-    clasificarFuncion(b, c);
-}
+    const res = document.getElementById("resultado");
+    const lineal = document.getElementById("lineal");
+    const afin = document.getElementById("afin");
+    const constante = document.getElementById("constante");
+    const sinFuncion = document.getElementById("sinFuncion");
 
-// Clasifica según las reglas de b y c
-function clasificarFuncion(b, c) {
-    const elResultado = document.getElementById("resultado");
-    const elLineal = document.getElementById("lineal");
-    const elAfin = document.getElementById("afin");
-    const elConstante = document.getElementById("constante");
-    const elSinFuncion = document.getElementById("sinFuncion");
-
-    // Limpia todas las cajas antes de llenar la que corresponde
-    elLineal.innerHTML = "No corresponde a una función lineal.";
-    elAfin.innerHTML = "No corresponde a una función afín.";
-    elConstante.innerHTML = "No corresponde a una función constante.";
-    elSinFuncion.innerHTML = "No aplica (hay función).";
-
-    // 1. Sin función: b = 0 y c = 0
-    if (b === 0 && c === 0) {
-        elResultado.innerText = "Sin función";
-        elSinFuncion.innerHTML =
-            "<p><b>f(x) = 0</b></p>" +
-            "<p>Como b = 0 y c = 0, no representa una función lineal, afín ni constante.</p>";
-        return;
-    }
-
-    // 2. Función constante: b = 0 y c != 0
-    if (b === 0 && c !== 0) {
-        elResultado.innerText = "Función Constante";
-        elConstante.innerHTML =
-            "<p><b>f(x) = " + c + "</b></p>" +
-            "<p>Recta horizontal (pendiente = 0).</p>" +
-            "<p>Corta el eje Y en (0, " + c + ").</p>";
-        return;
-    }
-
-    // 3. Función lineal: b != 0 y c = 0
-    if (b !== 0 && c === 0) {
-        elResultado.innerText = "Función Lineal";
-        elLineal.innerHTML =
-            "<p><b>f(x) = " + b + "x</b></p>" +
-            "<p>Pasa por el origen (0, 0).</p>" +
-            "<p>Pendiente: " + b + " (" + (b > 0 ? "creciente" : "decreciente") + ").</p>";
-        return;
-    }
-
-    // 4. Función afín: b != 0 y c != 0
-    const signoC = c > 0 ? " + " + c : " - " + Math.abs(c);
-    elResultado.innerText = "Función Afín";
-    elAfin.innerHTML =
-        "<p><b>f(x) = " + b + "x" + signoC + "</b></p>" +
-        "<p>No pasa por el origen (0, 0).</p>" +
-        "<p>Corta el eje Y en (0, " + c + ").</p>" +
-        "<p>Pendiente: " + b + " (" + (b > 0 ? "creciente" : "decreciente") + ").</p>" +
-        "<p>Traslación vertical de " + c + " unidades.</p>";
-}
-
-// Dibuja la expresión en el visor de GeoGebra
-function graficarEnGeoGebra(b, c) {
-    if (!ggbApplet) return;
-
-    ggbApplet.reset();
+    lineal.innerHTML = "No corresponde a una función lineal.";
+    afin.innerHTML = "No corresponde a una función afín.";
+    constante.innerHTML = "No corresponde a una función constante.";
+    sinFuncion.innerHTML = "No aplica (hay función).";
 
     if (b === 0 && c === 0) {
-        ggbApplet.evalCommand("0");
+        res.innerText = "Sin función";
+        sinFuncion.innerHTML = "<p><b>f(x) = 0</b></p><p>No hay función cuando b = 0 y c = 0.</p>";
     } else if (b === 0) {
-        ggbApplet.evalCommand("f(x) = " + c);
+        res.innerText = "Función Constante";
+        constante.innerHTML = `<p><b>f(x) = ${c}</b></p><p>Recta horizontal (pendiente 0).</p><p>Corta el eje Y en (0, ${c}).</p>`;
     } else if (c === 0) {
-        ggbApplet.evalCommand("f(x) = " + b + "*x");
+        res.innerText = "Función Lineal";
+        lineal.innerHTML = `<p><b>f(x) = ${b}x</b></p><p>Pasa por el origen (0, 0).</p><p>Pendiente: ${b} (${b > 0 ? "creciente" : "decreciente"}).</p>`;
     } else {
-        ggbApplet.evalCommand("f(x) = " + b + "*x + (" + c + ")");
+        const signo = c > 0 ? `+ ${c}` : `- ${Math.abs(c)}`;
+        res.innerText = "Función Afín";
+        afin.innerHTML = `<p><b>f(x) = ${b}x ${signo}</b></p><p>No pasa por el origen (0, 0).</p><p>Corta el eje Y en (0, ${c}).</p><p>Pendiente: ${b} (${b > 0 ? "creciente" : "decreciente"}).</p><p>Traslación vertical de ${c} unidades.</p>`;
     }
 }
 
-// Descarga el archivo .ggb actual
+// Dibuja en GeoGebra
+function graficar(b, c) {
+    if (!ggb) return;
+    ggb.reset();
+    if (b === 0 && c === 0) ggb.evalCommand("0");
+    else if (b === 0) ggb.evalCommand(`f(x) = ${c}`);
+    else if (c === 0) ggb.evalCommand(`f(x) = ${b}*x`);
+    else ggb.evalCommand(`f(x) = ${b}*x + (${c})`);
+}
+
+// Descarga el .ggb actual
 function descargarGGB() {
-    if (bActual === null || cActual === null || !ggbApplet) return;
-
-    if (typeof ggbApplet.getBase64 === "function") {
-        ggbApplet.getBase64(function (base64) {
-            const enlace = document.createElement("a");
-            enlace.href = "data:application/vnd.geogebra.file;base64," + base64;
-            enlace.download = "funcion_b" + bActual + "_c" + cActual + ".ggb";
-            enlace.click();
-        });
-    }
+    if (bActual === null || cActual === null || !ggb) return;
+    ggb.getBase64(function (base64) {
+        const a = document.createElement("a");
+        a.href = "data:application/vnd.geogebra.file;base64," + base64;
+        a.download = `funcion_b${bActual}_c${cActual}.ggb`;
+        a.click();
+    });
 }
 
-// Sube un archivo .ggb, lo muestra en el visor y lee su expresión
-document.getElementById("archivo").addEventListener("change", function () {
-    const archivo = this.files[0];
-    const textoNombre = document.getElementById("nombreArchivo");
+// Sube un .ggb, lo muestra y lee b y c
+document.getElementById("archivo").addEventListener("change", async function () {
+    const file = this.files[0];
+    const nombre = document.getElementById("nombreArchivo");
+    if (!file) return;
 
-    if (!archivo) return;
-
-    if (!archivo.name.endsWith(".ggb")) {
-        textoNombre.innerText = "Selecciona un archivo .ggb válido.";
+    if (!file.name.endsWith(".ggb")) {
+        nombre.innerText = "Selecciona un archivo .ggb válido.";
         return;
     }
 
-    textoNombre.innerText = "Archivo seleccionado: " + archivo.name;
+    nombre.innerText = "Archivo seleccionado: " + file.name;
+    const buffer = await file.arrayBuffer();
 
-    const lector = new FileReader();
-    lector.onload = async function (evento) {
-        const buffer = evento.target.result;
+    // Cargar en el visor
+    let bin = "";
+    new Uint8Array(buffer).forEach(byte => bin += String.fromCharCode(byte));
+    if (ggb) ggb.setBase64(btoa(bin));
 
-        // Cargar en GeoGebra
-        const bytes = new Uint8Array(buffer);
-        let binario = "";
-        for (let i = 0; i < bytes.length; i++) {
-            binario += String.fromCharCode(bytes[i]);
-        }
-        if (ggbApplet) {
-            ggbApplet.setBase64(btoa(binario));
-        }
+    // Leer el XML interno del .ggb
+    try {
+        const zip = await JSZip.loadAsync(buffer);
+        const xml = await zip.file("geogebra.xml").async("string");
+        const doc = new DOMParser().parseFromString(xml, "text/xml");
 
-        // Leer geogebra.xml dentro del .ggb para obtener b y c
-        try {
-            const zip = await JSZip.loadAsync(buffer);
-            const xmlArchivo = zip.file("geogebra.xml");
-            if (!xmlArchivo) return;
+        for (const nodo of doc.getElementsByTagName("expression")) {
+            const limpia = (nodo.getAttribute("exp") || "")
+                .replace(/\s+/g, "")
+                .replace(/^[a-zA-Z0-9_]+\(x\)=|^y=/i, "")
+                .replace(/\*/g, "");
 
-            const xmlTexto = await xmlArchivo.async("string");
-            const coef = extraerCoeficientesDesdeXML(xmlTexto);
-            if (coef) {
-                aplicarValores(coef.b, coef.c);
+            const conX = limpia.match(/^([+-]?\d*\.?\d*)x([+-]\d+\.?\d*)?$/i);
+            if (conX) {
+                const b = conX[1] === "" || conX[1] === "+" ? 1 : conX[1] === "-" ? -1 : Number(conX[1]);
+                const c = conX[2] ? Number(conX[2]) : 0;
+                if (!Number.isNaN(b) && !Number.isNaN(c)) {
+                    mostrar(b, c);
+                    break;
+                }
             }
-        } catch (error) {
-            console.error("No se pudo leer el archivo .ggb:", error);
-        }
-    };
 
-    lector.readAsArrayBuffer(archivo);
-});
-
-// Busca una expresión tipo "3x + 2", "5x" o "3" dentro del XML del .ggb
-function extraerCoeficientesDesdeXML(xmlTexto) {
-    const doc = new DOMParser().parseFromString(xmlTexto, "text/xml");
-    const expresiones = doc.getElementsByTagName("expression");
-
-    for (let i = 0; i < expresiones.length; i++) {
-        const exp = expresiones[i].getAttribute("exp");
-        if (!exp) continue;
-
-        // Limpia espacios y partes como "f(x) =" o "y ="
-        const limpia = exp
-            .replace(/\s+/g, "")
-            .replace(/^[a-zA-Z0-9_]+\(x\)=|^y=/i, "")
-            .replace(/\*/g, "");
-
-        // Caso con x: ej. 3x+2, -x-1, 5x
-        const conX = limpia.match(/^([+-]?\d*\.?\d*)x([+-]\d+\.?\d*)?$/i);
-        if (conX) {
-            const bTexto = conX[1];
-            const cTexto = conX[2];
-            const b = bTexto === "" || bTexto === "+" ? 1 : bTexto === "-" ? -1 : Number(bTexto);
-            const c = cTexto ? Number(cTexto) : 0;
-            if (!Number.isNaN(b) && !Number.isNaN(c)) {
-                return { b, c };
+            const soloNum = limpia.match(/^([+-]?\d+\.?\d*)$/);
+            if (soloNum && !Number.isNaN(Number(soloNum[1]))) {
+                mostrar(0, Number(soloNum[1]));
+                break;
             }
         }
-
-        // Caso sin x (constante): ej. 3, -2, 0
-        const soloNumero = limpia.match(/^([+-]?\d+\.?\d*)$/);
-        if (soloNumero) {
-            const c = Number(soloNumero[1]);
-            if (!Number.isNaN(c)) {
-                return { b: 0, c };
-            }
-        }
+    } catch (err) {
+        console.error(err);
     }
-
-    return null;
-}
+});
