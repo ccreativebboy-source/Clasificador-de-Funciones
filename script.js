@@ -2,21 +2,18 @@ let bActual = null;
 let cActual = null;
 let ggb = null;
 
-// Carga el visor de GeoGebra Clásico
+// 1.- Carga el visor de GeoGebra Clásico
 window.addEventListener("load", function () {
     new GGBApplet({
         appName: "classic",
-        width: 600,
+        width: 625,
         height: 380,
-        showToolBar: true,
-        showAlgebraInput: true,
-        showMenuBar: false,
         language: "es",
         appletOnLoad: function (api) { ggb = api; }
     }, true).inject("ggb-element");
 });
 
-// Genera b y c aleatorios entre -3 y 3
+// 2.- Genera b y c valores aleatorios entre -3 y 3
 function generar() {
     const b = Math.floor(Math.random() * 7) - 3;
     const c = Math.floor(Math.random() * 7) - 3;
@@ -24,7 +21,7 @@ function generar() {
     graficar(b, c);
 }
 
-// Muestra coeficientes y clasifica en las 4 cajas
+// 3.- Muestra coeficientes y clasifica en las 4 si son lineal, afin, constante, sin funcion
 function mostrar(b, c) {
     bActual = b;
     cActual = c;
@@ -39,28 +36,35 @@ function mostrar(b, c) {
     const constante = document.getElementById("constante");
     const sinFuncion = document.getElementById("sinFuncion");
 
+    // estos son los textos que se mostraran cuando se seleccionen de los coeficientes uno como principal
+    // (ejemplo: si es una funcion lineal, las otras por descarte mostraran un texto que dira que no cataloga como otra funcion)
     lineal.innerHTML = "No corresponde a una función lineal.";
     afin.innerHTML = "No corresponde a una función afín.";
     constante.innerHTML = "No corresponde a una función constante.";
     sinFuncion.innerHTML = "No aplica (hay función).";
 
     if (b === 0 && c === 0) {
+        // Si es sin funcion, se mostrara este texto en la caja "sinfuncion"
         res.innerText = "Sin función";
         sinFuncion.innerHTML = "<p><b>f(x) = 0</b></p><p>No hay función cuando b = 0 y c = 0.</p>";
     } else if (b === 0) {
+        // Si no es asi el calculo entonces se dara como funcion constante, mostrando el texto en la caja de "funcion constnte"
         res.innerText = "Función Constante";
         constante.innerHTML = `<p><b>f(x) = ${c}</b></p><p>Recta horizontal (pendiente 0).</p><p>Corta el eje Y en (0, ${c}).</p>`;
     } else if (c === 0) {
+        // si el coeficiente pasa por el origen 0,se mostrara este texto en su caja "funcion lineal"
         res.innerText = "Función Lineal";
         lineal.innerHTML = `<p><b>f(x) = ${b}x</b></p><p>Pasa por el origen (0, 0).</p><p>Pendiente: ${b} (${b > 0 ? "creciente" : "decreciente"}).</p>`;
     } else {
         const signo = c > 0 ? `+ ${c}` : `- ${Math.abs(c)}`;
+        // y por ultimo, si no pasa se le catalogara como afin, mostrando este texto en la caja "funcion afin"
         res.innerText = "Función Afín";
         afin.innerHTML = `<p><b>f(x) = ${b}x ${signo}</b></p><p>No pasa por el origen (0, 0).</p><p>Corta el eje Y en (0, ${c}).</p><p>Pendiente: ${b} (${b > 0 ? "creciente" : "decreciente"}).</p><p>Traslación vertical de ${c} unidades.</p>`;
     }
 }
 
-// Dibuja en GeoGebra
+// 4.- Dibujar la en GeoGebra
+// esta al tener un numero random con las propiedades de b y c, aparte de identificar que funcion es, tambien se mostrara en el grafico visualmente de geogebra
 function graficar(b, c) {
     if (!ggb) return;
     ggb.reset();
@@ -70,7 +74,7 @@ function graficar(b, c) {
     else ggb.evalCommand(`f(x) = ${b}*x + (${c})`);
 }
 
-// Descarga el .ggb actual
+// 6.- Descarga el .ggb de la pagina
 function descargarGGB() {
     if (bActual === null || cActual === null || !ggb) return;
     ggb.getBase64(function (base64) {
@@ -81,7 +85,7 @@ function descargarGGB() {
     });
 }
 
-// Sube un .ggb, lo muestra y lee b y c
+// 7.- Sube un .ggb, lo muestra y lee b y c, incluyendo geogebra.
 document.getElementById("archivo").addEventListener("change", async function () {
     const file = this.files[0];
     const nombre = document.getElementById("nombreArchivo");
@@ -95,7 +99,7 @@ document.getElementById("archivo").addEventListener("change", async function () 
     nombre.innerText = "Archivo seleccionado: " + file.name;
     const buffer = await file.arrayBuffer();
 
-    // Cargar en el visor
+    // Cargar en el visual
     let bin = "";
     new Uint8Array(buffer).forEach(byte => bin += String.fromCharCode(byte));
     if (ggb) ggb.setBase64(btoa(bin));

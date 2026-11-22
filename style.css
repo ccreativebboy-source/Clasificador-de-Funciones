@@ -9,7 +9,7 @@ body {
 }
 
 .contenedor {
-    background-color: white;
+    background-color: #ffffffa6;
     max-width: 650px;
     margin: auto;
     border-radius: 5px;
@@ -79,21 +79,4 @@ button:active {
 .caja h3 {
     font-size: 14px;
     margin: 0 0 8px;
-}
-
-.caja div {
-    font-size: 13px;
-    color: #64748b;
-    line-height: 1.5;
-}
-
-.enlaces {
-    border-top: 1px solid #cbd5e1;
-    margin-top: 10px;
-    padding-top: 5px;
-    font-size: 13px;
-}
-
-.enlaces a {
-    color: #2563eb;
 }
