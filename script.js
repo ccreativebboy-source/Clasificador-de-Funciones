@@ -6,12 +6,12 @@ let ggb = null;
 // 1.- Carga el visor de GeoGebra Clásico cuando termina de cargar la ventana
 window.addEventListener("load", function () {
     new GGBApplet({
-        appName: "classic",       // Usa la versión clásica de GeoGebra
-        width: 625,               // Ancho del visor en píxeles
-        height: 380,              // Alto del visor en píxeles
-        language: "es",           // Idioma de la interfaz en español
+        appName: "classic", // Usa la versión clásica de GeoGebra
+        width: 625,
+        height: 380,
+        language: "es",
         appletOnLoad: function (api) {
-            ggb = api;            // Guarda el objeto API cuando GeoGebra termina de inicializar
+            ggb = api;  // Guarda el objeto API cuando GeoGebra termina de inicializar
         }
     }, true).inject("ggb-element"); // Inserta el visor dentro del elemento con id "ggb-element"
 });
@@ -20,8 +20,8 @@ window.addEventListener("load", function () {
 function generar() {
     let b, c;
 
-    // 25% de probabilidad de que salgan b = 0 y c = 0 ("Sin función")
-    if (Math.random() < 0.25) {
+    // 50% de probabilidad de que salgan b = 0 y c = 0 ("Sin función")
+    if (Math.random() < 0.50) {
         b = 0;
         c = 0;
     } else {
@@ -66,7 +66,7 @@ function mostrar(b, c) {
     constante.innerHTML = `<p><b>Función Constante:</b> f(x) = k <i>(forma general: ${b === 0 && c !== 0 ? `f(x) = ${c}` : "requiere b = 0 y c ≠ 0"})</i></p><p>No corresponde en este caso.</p>`;
     sinFuncion.innerHTML = `<p><b>Sin función:</b> f(x) = 0 <i>(ocurre cuando b = 0 y c = 0)</i></p><p>No aplica en este caso.</p>`;
 
-    // Caso 1: b = 0 y c = 0 -> Sin función
+    // Caso 1: b = 0 y c = 0 "Sin función"
     if (b === 0 && c === 0) {
         res.innerText = "Sin función";
         sinFuncion.innerHTML = `
@@ -74,7 +74,7 @@ function mostrar(b, c) {
             <p>No hay función cuando b = 0 y c = 0.</p>
         `;
     }
-    // Caso 2: b = 0 y c != 0 -> Función constante
+    // Caso 2: b = 0 y c != 0 "Función constante"
     else if (b === 0) {
         res.innerText = "Función Constante";
         constante.innerHTML = `
@@ -83,7 +83,7 @@ function mostrar(b, c) {
             <p>Corta el eje Y en (0, ${c}).</p>
         `;
     }
-    // Caso 3: c = 0 y b != 0 -> Función lineal
+    // Caso 3: c = 0 y b != 0 "Función lineal"
     else if (c === 0) {
         res.innerText = "Función Lineal";
         lineal.innerHTML = `
@@ -92,7 +92,7 @@ function mostrar(b, c) {
             <p>Pendiente: ${b} (${b > 0 ? "creciente" : "decreciente"}).</p>
         `;
     }
-    // Caso 4: b != 0 y c != 0 -> Función afín
+    // Caso 4: b != 0 y c != 0 "Función afín"
     else {
         const signo = c > 0 ? `+ ${c}` : `- ${Math.abs(c)}`;
         res.innerText = "Función Afín";
