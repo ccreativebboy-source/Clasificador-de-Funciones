@@ -35,7 +35,14 @@ h2 {
     margin-top: 0;
 }
 
-img {
+.imgI {
+    position: absolute;
+    width: 250px;
+    left: 40px;
+    opacity: 0.5;
+}
+
+.imgD {
     position: absolute;
     width: 250px;
     right: 40px;
